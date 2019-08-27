@@ -1,0 +1,34 @@
+version: "3"
+services:
+  server:
+    image: perf-image:v1
+    command: bash -c "ServerUDP > log_server.csv"
+    volumes:
+      - /home/$USER/Output/client5:/go/src/app
+    networks:
+      default:
+        ipv4_address: 172.21.0.2
+  client:
+    image: perf-image:v1
+    volumes:
+      - /home/$USER/Output/client5:/go/src/app
+    command: bash -c "ClientUDP 172.21.0.2 5 > log_client.csv"
+    networks:
+      default:  
+    deploy:
+      replicas: 5
+    depends_on:
+      - server
+
+networks:
+  # caso crie docker network...
+  # docker network create --driver overlay --scope swarm --subnet=172.21.0.0/16 testnet
+  default:
+    external:
+      name: testnet
+  # static-ip:
+  #   driver: bridge
+  #   ipam:
+  #     driver: default
+  #     config:
+  #       - subnet: 172.21.0.0/16
