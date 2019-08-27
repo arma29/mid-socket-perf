@@ -18,44 +18,55 @@ func main() {
 	addr, err := net.ResolveUDPAddr("udp", service)
 	shared.CheckError(err)
 
+	// Listening in all interfaces , port number 1200
 	conn, err := net.ListenUDP("udp", addr)
 	shared.CheckError(err)
+
 	fmt.Println("UDP Server listening at", addr)
 
-	quit := make(chan struct{})
-	for i := 0; i < runtime.NumCPU(); i++ {
-		go handleConnection(conn, quit)
-	}
-	<-quit // hang until an error
+	// Signalling channel
+	done := make(chan struct{})
 
+	// Parallel -> starts multiple go routines
+	// Each one do the ReadFromUDP loop
+	for i := 0; i < runtime.NumCPU(); i++ {
+		// go routine -> thread
+		go handleConnection(conn, done)
+	}
+	// Wait for the loop finishes -> until error
+	<-done
 }
 
-func handleConnection(conn *net.UDPConn, quit chan struct{}) {
+func handleConnection(conn *net.UDPConn, done chan struct{}) {
 
+	// Byte structure to pass as argument in ReadFromUDP
 	request := make([]byte, 1024)
-
 	n, addr, err := 0, new(net.UDPAddr), error(nil)
 	for err == nil {
+		// Reads a payload of the recieved UDP datagram
+		// Copy the payload into 'request'
+		// n -> number of bytes copied into 'request'
+		// addr -> source address
 		n, addr, err = conn.ReadFromUDP(request)
-		if err != nil {
-			return
-		}
 
+		// Deserialization: byte -> string -> int
 		number, _ := strconv.Atoi(string(request[:n]))
 
 		t1 := time.Now()
 
 		response := application.Fibbonacci(number)
+		// Sends the serialized response: int -> string -> byte to addr
 		conn.WriteToUDP([]byte(strconv.Itoa(response)), addr)
 
 		t2 := time.Now()
 
 		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
 		s := fmt.Sprintf("Fibonacci: %d - Process Time: %f", number, x)
-		fmt.Println(s)
-		fmt.Println("from", addr, "-", request[:n])
+		// fmt.Println(s)
+		fmt.Println("From", addr, "-", s)
 	}
+	// Error
 	fmt.Println("Listener failed - ", err)
-	quit <- struct{}{}
+	done <- struct{}{}
 
 }
