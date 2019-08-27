@@ -22,7 +22,7 @@ func main() {
 	conn, err := net.ListenUDP("udp", addr)
 	shared.CheckError(err)
 
-	fmt.Println("UDP Server listening at", addr)
+	fmt.Println("Fibonacci, From, Time")
 
 	// Signalling channel
 	done := make(chan struct{})
@@ -61,9 +61,8 @@ func handleConnection(conn *net.UDPConn, done chan struct{}) {
 		t2 := time.Now()
 
 		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
-		s := fmt.Sprintf("Fibonacci: %d - Process Time: %f", number, x)
-		// fmt.Println(s)
-		fmt.Println("From", addr, "-", s)
+		s := fmt.Sprintf("%d, %s, %f", number, addr, x)
+		fmt.Println(s)
 	}
 	// Error
 	fmt.Println("Listener failed - ", err)

@@ -19,7 +19,6 @@ func main() {
 	}
 
 	ipContainer := os.Args[1]
-	fmt.Println(ipContainer)
 
 	// container ipContainer at port 1200
 	service := ipContainer + ":" + strconv.Itoa(shared.UDP_PORT)
@@ -35,7 +34,7 @@ func main() {
 	number := os.Args[2]
 	// Serializes the request: string -> byte
 	request := []byte(number)
-
+	fmt.Println("Fibonacci, Sample, Time")
 	for i := 0; i < shared.SAMPLE_SIZE; i++ {
 		t1 := time.Now()
 
@@ -52,7 +51,7 @@ func main() {
 
 		t2 := time.Now()
 		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
-		s := fmt.Sprintf("Fibonacci: %s - Sample: %d - %f", number, i, x)
+		s := fmt.Sprintf("%s, %d, %f", number, i, x)
 		fmt.Println(s)
 	}
 
