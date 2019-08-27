@@ -52,7 +52,7 @@ func main() {
 
 		t2 := time.Now()
 		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
-		s := fmt.Sprintf("Fibonacci: %s - %s - Sample: %d - %f", number, string(response), i, x)
+		s := fmt.Sprintf("Fibonacci: %s - Sample: %d - %f", number, i, x)
 		fmt.Println(s)
 	}
 
