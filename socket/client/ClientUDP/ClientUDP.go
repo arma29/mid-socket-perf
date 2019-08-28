@@ -32,11 +32,13 @@ func main() {
 	defer conn.Close()
 
 	number := os.Args[2]
-	// Serializes the request: string -> byte
-	request := []byte(number)
 	fmt.Println("Fibonacci, Sample, Time")
 	for i := 0; i < shared.SAMPLE_SIZE; i++ {
+
 		t1 := time.Now()
+
+		// Serializes the request: string -> byte
+		request := []byte(number)
 
 		// Sends the request
 		_, err = conn.Write(request)
@@ -46,10 +48,14 @@ func main() {
 		response := make([]byte, 1024)
 
 		// Response now has the payload of recieved UDP datagram
-		_, _, err = conn.ReadFromUDP(response)
+		n, _, err := conn.ReadFromUDP(response)
 		shared.CheckError(err)
 
+		// Deserializes the response
+		_ = string(response[:n])
+
 		t2 := time.Now()
+
 		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
 		s := fmt.Sprintf("%s, %d, %f", number, i, x)
 		fmt.Println(s)

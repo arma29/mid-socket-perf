@@ -7,7 +7,7 @@ import (
 
 const UDP_PORT = 1200
 const TCP_PORT = 7171
-const SAMPLE_SIZE = 10000
+const SAMPLE_SIZE = 100
 const PORT_LIMIT = 6000
 
 func CheckError(err error) {
