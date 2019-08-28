@@ -1,8 +1,8 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"strconv"
@@ -21,39 +21,36 @@ func main() {
 
 	ipContainer := os.Args[1]
 
-	// container ipContainer at port 7171
-	service := ipContainer + ":" + strconv.Itoa(shared.TCP_PORT)
-
-	tcpAddr, err := net.ResolveTCPAddr("tcp", service)
+	// Conect to server ipContainer : 7171
+	conn, err := net.Dial("tcp", ipContainer+":"+
+		strconv.Itoa(shared.TCP_PORT))
 	shared.CheckError(err)
 
-	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	shared.CheckError(err)
+	var msgFromServer string
 
-	number := os.Args[2]
+	jsonDecoder := json.NewDecoder(conn)
+	jsonEncoder := json.NewEncoder(conn)
+
 	fmt.Println("Fibonacci, Sample, Time")
 	for i := 0; i < shared.SAMPLE_SIZE; i++ {
 
 		t1 := time.Now()
 
-		// Serializes the request: string -> byte
-		request := []byte(number)
+		// Prepares the request
+		msgToServer := os.Args[2]
 
-		// Sends the request
-		_, err = conn.Write(request)
+		// Serializes + Send
+		err = jsonEncoder.Encode(msgToServer)
 		shared.CheckError(err)
 
-		// Recieve the request
-		result, err := ioutil.ReadAll(conn)
+		// Recieve + Deserializes
+		err = jsonDecoder.Decode(&msgFromServer)
 		shared.CheckError(err)
-
-		// Deserializes the response
-		_ = string(result)
 
 		t2 := time.Now()
 
 		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
-		s := fmt.Sprintf("%s, %d, %f", number, i, x)
+		s := fmt.Sprintf("%s, %d, %f", msgToServer, i, x)
 		fmt.Println(s)
 	}
 	os.Exit(0)

@@ -20,16 +20,14 @@ func main() {
 
 	ipContainer := os.Args[1]
 
-	// container ipContainer at port 1200
 	service := ipContainer + ":" + strconv.Itoa(shared.UDP_PORT)
 
 	addr, err := net.ResolveUDPAddr("udp", service)
 	shared.CheckError(err)
 
+	// Conect to server ipContainer : 7171
 	conn, err := net.DialUDP("udp", nil, addr)
 	shared.CheckError(err)
-
-	defer conn.Close()
 
 	number := os.Args[2]
 	fmt.Println("Fibonacci, Sample, Time")

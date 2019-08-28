@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"strconv"
@@ -12,15 +13,8 @@ import (
 
 func main() {
 
-	// Localhost at port 7171
-	service := ":" + strconv.Itoa(shared.TCP_PORT)
-
-	// Get TCP Address
-	tcpAddr, err := net.ResolveTCPAddr("tcp", service)
-	shared.CheckError(err)
-
-	// Prepare to Listen
-	listener, err := net.ListenTCP("tcp", tcpAddr)
+	// Listening in all interfaces , port number 7171
+	listener, err := net.Listen("tcp", ":"+strconv.Itoa(shared.TCP_PORT))
 	shared.CheckError(err)
 
 	fmt.Println("Fibonacci, From, Time")
@@ -29,9 +23,9 @@ func main() {
 	for {
 
 		conn, err := listener.Accept()
-		if err != nil {
-			return
-		}
+		shared.CheckError(err)
+
+		defer conn.Close()
 
 		go handleConnection(conn)
 	}
@@ -39,34 +33,32 @@ func main() {
 }
 
 func handleConnection(conn net.Conn) {
-	defer conn.Close()
-	// Byte structure to pass as argument in Read
-	request := make([]byte, 1024)
+	var msgFromClient string
 
-	// for i := 0; i < shared.SAMPLE_SIZE; i++ {
+	jsonDecoder := json.NewDecoder(conn)
+	jsonEncoder := json.NewEncoder(conn)
 
-	// Read Client Request
-	n, err := conn.Read(request)
-	shared.CheckError(err)
+	// Same loop from Client Side
+	for i := 0; i < shared.SAMPLE_SIZE; i++ {
 
-	strRequest := string(request[:n])
-	// Deserializate the request
-	number, err := strconv.Atoi(strRequest)
-	shared.CheckError(err)
+		// Recieve + Deserializes
+		err := jsonDecoder.Decode(&msgFromClient)
+		shared.CheckError(err)
 
-	t1 := time.Now()
+		t1 := time.Now()
 
-	response := application.Fibbonacci(number)
-	// Serializate and Sends the response
-	conn.Write([]byte(strconv.Itoa(response)))
+		// Prepare the response
+		number, _ := strconv.Atoi(msgFromClient)
+		msgToClient := application.Fibbonacci(number)
 
-	t2 := time.Now()
+		t2 := time.Now()
 
-	x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
-	s := fmt.Sprintf("%d, %s, %f", number, conn.RemoteAddr(), x)
-	fmt.Println(s)
-	// }
-	// for {
-	// }
+		// Serializes + Send
+		err = jsonEncoder.Encode(strconv.Itoa(msgToClient))
+		shared.CheckError(err)
 
+		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
+		s := fmt.Sprintf("%d, %s, %f", number, conn.RemoteAddr(), x)
+		fmt.Println(s)
+	}
 }

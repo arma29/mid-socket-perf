@@ -13,9 +13,7 @@ import (
 
 func main() {
 
-	service := ":" + strconv.Itoa(shared.UDP_PORT)
-
-	addr, err := net.ResolveUDPAddr("udp", service)
+	addr, err := net.ResolveUDPAddr("udp", ":"+strconv.Itoa(shared.UDP_PORT))
 	shared.CheckError(err)
 
 	// Listening in all interfaces , port number 1200
@@ -55,10 +53,10 @@ func handleConnection(conn *net.UDPConn, done chan struct{}) {
 		t1 := time.Now()
 
 		response := application.Fibbonacci(number)
-		// Sends the serialized response: int -> string -> byte to addr
-		conn.WriteToUDP([]byte(strconv.Itoa(response)), addr)
 
 		t2 := time.Now()
+		// Sends the serialized response: int -> string -> byte to addr
+		conn.WriteToUDP([]byte(strconv.Itoa(response)), addr)
 
 		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
 		s := fmt.Sprintf("%d, %s, %f", number, addr, x)
