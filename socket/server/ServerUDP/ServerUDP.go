@@ -20,7 +20,7 @@ func main() {
 	conn, err := net.ListenUDP("udp", addr)
 	shared.CheckError(err)
 
-	fmt.Println("Fibonacci, From, Time")
+	fmt.Println("Fibonacci,From,Time")
 
 	// Signalling channel
 	done := make(chan struct{})
@@ -59,7 +59,7 @@ func handleConnection(conn *net.UDPConn, done chan struct{}) {
 		conn.WriteToUDP([]byte(strconv.Itoa(response)), addr)
 
 		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
-		s := fmt.Sprintf("%d, %s, %f", number, addr, x)
+		s := fmt.Sprintf("%d,%s,%f", number, addr, x)
 		fmt.Println(s)
 	}
 	// Error

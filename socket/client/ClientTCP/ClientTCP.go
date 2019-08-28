@@ -31,7 +31,7 @@ func main() {
 	jsonDecoder := json.NewDecoder(conn)
 	jsonEncoder := json.NewEncoder(conn)
 
-	fmt.Println("Fibonacci, Sample, Time")
+	fmt.Println("Fibonacci,Sample,Time")
 	for i := 0; i < shared.SAMPLE_SIZE; i++ {
 
 		t1 := time.Now()
@@ -50,7 +50,7 @@ func main() {
 		t2 := time.Now()
 
 		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
-		s := fmt.Sprintf("%s, %d, %f", msgToServer, i, x)
+		s := fmt.Sprintf("%s,%d,%f", msgToServer, i, x)
 		fmt.Println(s)
 	}
 	os.Exit(0)
