@@ -2,10 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net"
 	"strconv"
-	"time"
 
 	"github.com/arma29/mid-socket-perf/application"
 	"github.com/arma29/mid-socket-perf/shared"
@@ -17,7 +15,7 @@ func main() {
 	listener, err := net.Listen("tcp", ":"+strconv.Itoa(shared.TCP_PORT))
 	shared.CheckError(err)
 
-	fmt.Println("Fibonacci,From,Time")
+	// fmt.Println("Fibonacci,From,Time")
 
 	// Infinite loop to listen to connections
 	for {
@@ -45,20 +43,18 @@ func handleConnection(conn net.Conn) {
 		err := jsonDecoder.Decode(&msgFromClient)
 		shared.CheckError(err)
 
-		t1 := time.Now()
-
+		// t1 := time.Now()
 		// Prepare the response
 		number, _ := strconv.Atoi(msgFromClient)
 		msgToClient := application.Fibbonacci(number)
-
-		t2 := time.Now()
+		// t2 := time.Now()
 
 		// Serializes + Send
 		err = jsonEncoder.Encode(strconv.Itoa(msgToClient))
 		shared.CheckError(err)
 
-		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
-		s := fmt.Sprintf("%d,%s,%f", number, conn.RemoteAddr(), x)
-		fmt.Println(s)
+		// x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
+		// s := fmt.Sprintf("%d,%s,%f", number, conn.RemoteAddr(), x)
+		// fmt.Println(s)
 	}
 }

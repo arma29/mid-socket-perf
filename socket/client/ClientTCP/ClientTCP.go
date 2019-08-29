@@ -35,7 +35,6 @@ func main() {
 	for i := 0; i < shared.SAMPLE_SIZE; i++ {
 
 		t1 := time.Now()
-
 		// Prepares the request
 		msgToServer := os.Args[2]
 
@@ -46,7 +45,6 @@ func main() {
 		// Recieve + Deserializes
 		err = jsonDecoder.Decode(&msgFromServer)
 		shared.CheckError(err)
-
 		t2 := time.Now()
 
 		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000

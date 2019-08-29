@@ -31,10 +31,9 @@ func main() {
 
 	number := os.Args[2]
 	fmt.Println("Fibonacci,Sample,Time")
+
 	for i := 0; i < shared.SAMPLE_SIZE; i++ {
-
 		t1 := time.Now()
-
 		// Serializes the request: string -> byte
 		request := []byte(number)
 
@@ -51,7 +50,6 @@ func main() {
 
 		// Deserializes the response
 		_ = string(response[:n])
-
 		t2 := time.Now()
 
 		x := float64(t2.Sub(t1).Nanoseconds()) / 1000000
