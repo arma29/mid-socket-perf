@@ -1,0 +1,20 @@
+version: "3" # To Deploy on swarm mode (See NOT SUPPORTED FOR DOCKER STACK DEPLOY)
+services:
+  server:
+    image: perf-image:v1
+    command: bash -c "ServerTCP"
+    volumes:
+      - /home/$USER/Output/tcp_client5:/go/src/app
+  client:
+    image: perf-image:v1
+    volumes:
+      - /home/$USER/Output/tcp_client5:/go/src/app
+    command: bash -c "sleep 5s; ClientTCP $$IPSERVER $$NUMBER >> log_client$$SLOT.csv"
+    deploy:
+      replicas: 5
+      restart_policy:
+        condition: none
+    environment:
+    - SLOT={{.Task.Slot}}
+    - IPSERVER=server # We got the ip like this
+    - NUMBER=5
